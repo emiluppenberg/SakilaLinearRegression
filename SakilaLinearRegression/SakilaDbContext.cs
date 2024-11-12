@@ -11,10 +11,27 @@ namespace SakilaLinearRegression
     {
         private readonly string connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Sakila;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
 
-        public DbSet<Payment> payment { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(connectionString);
+        }
+
+        public List<decimal> DataPerCost(int customerId)
+        {
+            return Database
+                .SqlQueryRaw<decimal>("select amount from payment where customer_id = @p0", customerId)
+                .ToList();
+        }
+
+        public List<decimal> DataRequest(int customerId, string request)
+        {
+            switch (request)
+            {
+                case "per cost":
+                    return DataPerCost (customerId);
+                default:
+                    throw new Exception();
+            }
         }
     }
 }

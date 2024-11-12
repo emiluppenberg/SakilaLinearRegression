@@ -7,6 +7,8 @@ namespace SakilaLinearRegression
         static void Main(string[] args)
         {
             var context = new SakilaDbContext();
+            var ui = new SakilaUI();
+            var helper = new SakilaHelper();
 
             while (true)
             {
@@ -35,73 +37,17 @@ namespace SakilaLinearRegression
                 { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " }
             };
 
-                for (int i = 0; i < array.GetLength(0); i++)
-                {
-                    for (int j = 0; j < array.GetLength(1); j++)
-                    {
-                        Console.Write(array[i, j]);
-                    }
-                    Console.WriteLine();
-                }
+                string request = ui.Menu(array);
 
-                Console.WriteLine(" X: Cost per rental\n Y: Rental per cost");
-                Console.Write(" Enter CustomerId: ");
-                int customerIdInput = Convert.ToInt32(Console.ReadLine());
-                Console.Clear();
+                int customerId = ui.InputCustomerId(array);
 
-                var payments = context.payment
-                    .Where(p => p.customer_id == customerIdInput)
-                    .ToList();
+                List<decimal> customerRentals;
+                double[] xValues;
+                double[] yValues;
 
-                var xValues = new double[10] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-                var yValues = new double[10];
-
-                for (int i = 0; i < yValues.Length; i++)
-                {
-                    foreach (var p in payments)
-                    {
-                        if (i == 0 && p.amount == 0.99M)
-                        {
-                            yValues[i]++;
-                        }
-                        if (i == 1 && p.amount == 1.99M)
-                        {
-                            yValues[i]++;
-                        }
-                        if (i == 2 && p.amount == 2.99M)
-                        {
-                            yValues[i]++;
-                        }
-                        if (i == 3 && p.amount == 3.99M)
-                        {
-                            yValues[i]++;
-                        }
-                        if (i == 4 && p.amount == 4.99M)
-                        {
-                            yValues[i]++;
-                        }
-                        if (i == 5 && p.amount == 5.99M)
-                        {
-                            yValues[i]++;
-                        }
-                        if (i == 6 && p.amount == 6.99M)
-                        {
-                            yValues[i]++;
-                        }
-                        if (i == 7 && p.amount == 7.99M)
-                        {
-                            yValues[i]++;
-                        }
-                        if (i == 8 && p.amount == 8.99M)
-                        {
-                            yValues[i]++;
-                        }
-                        if (i == 9 && p.amount == 9.99M)
-                        {
-                            yValues[i]++;
-                        }
-                    }
-                }
+                customerRentals = context.DataRequest(customerId, request);
+                xValues = helper.ValuesRequestX(customerRentals, request);
+                yValues = helper.ValuesRequestY(customerRentals, request);
 
                 var slope = LeastSquares(yValues, xValues);
 
@@ -127,13 +73,13 @@ namespace SakilaLinearRegression
                                     }
                                     if (array[i, j] == " / ")
                                     {
-                                        array[i, j] = $" %{x+1} ";
+                                        array[i, j] = $" %{x + 1} ";
                                         xValues[x] = 20;
                                         yValues[y] = 20;
                                     }
                                     else
                                     {
-                                        array[i, j] = $" {x+1} ";
+                                        array[i, j] = $" {x + 1} ";
                                         xValues[x] = 20;
                                         yValues[y] = 20;
                                     }
@@ -173,7 +119,7 @@ namespace SakilaLinearRegression
                     }
                     Console.WriteLine();
                 }
-                Console.WriteLine($" X: Cost per rental\n Y: Rental per cost\n CustomerID: {customerIdInput}");
+                Console.WriteLine($" X: Cost per rental\n Y: Rental per cost\n CustomerID: {customerId}");
 
                 Console.ReadKey();
             }
