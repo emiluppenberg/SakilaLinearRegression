@@ -22,16 +22,5 @@ namespace SakilaLinearRegression
                 .SqlQueryRaw<decimal>("select amount from payment where customer_id = @p0", customerId)
                 .ToList();
         }
-
-        public List<decimal> DataRequest(int customerId, string request)
-        {
-            switch (request)
-            {
-                case "per cost":
-                    return DataPerCost (customerId);
-                default:
-                    throw new Exception();
-            }
-        }
     }
 }

@@ -3,66 +3,59 @@ namespace SakilaLinearRegression
 {
     internal class SakilaUI
     {
-        public string Menu(string[,] array)
+        public string Menu()
         {
             while (true)
             {
-                for (int i = 0; i < array.GetLength(0); i++)
-                {
-                    for (int j = 0; j < array.GetLength(1); j++)
-                    {
-                        Console.Write(array[i, j]);
-                    }
-                    Console.WriteLine();
-                }
-
-                Console.WriteLine(
-                    "Press 1 - Total rentals per cost\n" +
-                    "Press 2 - Total rentals per film length\n" +
-                    "Press 3 - Total rentals per film rating\n");
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("  Press 1 - ");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.Write("Total rentals per cost\n");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("  Press 2 - ");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.Write("Total rentals per film length\n");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("  Press 3 - ");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.Write("Total rentals per rating\n");
+                Console.ForegroundColor = ConsoleColor.White;
 
                 switch (Console.ReadKey(true).KeyChar)
                 {
                     case '1':
-                        return "per cost";
+                        return "per-cost";
                     case '2':
-                        return "per film length";
+                        return "per-film-length";
                     case '3':
-                        return "per film rating";
+                        return "per-film-rating";
                     default:
                         Console.Clear();
-                        Console.WriteLine("Invalid input");
+                        Console.WriteLine("  Invalid input");
                         Thread.Sleep(1000);
-                        Console.Clear();
                         break;
                 }
             }
         }
 
-        internal int InputCustomerId(string[,] array)
+        internal int InputCustomerId()
         {
             while (true)
             {
                 Console.Clear();
 
-                for (int i = 0; i < array.GetLength(0); i++)
-                {
-                    for (int j = 0; j < array.GetLength(1); j++)
-                    {
-                        Console.Write(array[i, j]);
-                    }
-                    Console.WriteLine();
-                }
-
-                Console.Write(" Enter CustomerId: ");
-
+                Console.Write("  CustomerId: ");
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
                 if (int.TryParse(Console.ReadLine(), out int customerId))
                 {
+                    Console.ForegroundColor = ConsoleColor.White;
                     return customerId;
                 }
 
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.Clear();
-                Console.WriteLine("Invalid input");
+                Console.WriteLine("  Invalid input");
                 Thread.Sleep(1000);
             }
         }

@@ -12,173 +12,115 @@ namespace SakilaLinearRegression
 
             while (true)
             {
-                Console.Clear();
+                string request = ui.Menu();
 
-                var array = new string[20, 10] {
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " },
-                { " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - ", " - " }
-            };
+                int customerId = ui.InputCustomerId();
 
-                string request = ui.Menu(array);
-
-                int customerId = ui.InputCustomerId(array);
-
-                List<decimal> customerRentals;
                 double[] xValues;
                 double[] yValues;
 
-                customerRentals = context.DataRequest(customerId, request);
-                xValues = helper.ValuesRequestX(customerRentals, request);
-                yValues = helper.ValuesRequestY(customerRentals, request);
-
-                var slope = LeastSquares(yValues, xValues);
-
-                for (int i = 0; i < slope.Length; i++)
+                if (request == "per-cost")
                 {
-                    array[Convert.ToInt32(slope[i]), Convert.ToInt32(xValues[i])] = " / ";
-                }
+                    var customerRentals = context.DataPerCost(customerId);
+                    xValues = helper.ValuesPerCostX(customerRentals);
+                    yValues = helper.ValuesPerCostY(customerRentals);
 
-                for (int i = 0; i < array.GetLength(0); i++)
-                {
-                    for (int j = 0; j < array.GetLength(1); j++)
+                    string[,] array = helper.CreateArray(yValues.Length, xValues.Length);
+
+                    var slope = helper.LeastSquares(yValues, xValues);
+
+                    for (int i = 0; i < slope.Length; i++)
                     {
-                        for (int x = 0; x < xValues.Length; x++)
+                        array[array.GetLength(0) - Convert.ToInt32(slope[i]), Convert.ToInt32(xValues[i]) - 1] = "  /  ";
+                    }
+
+                    // Write data to array
+                    for (int i = 0; i < array.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < array.GetLength(1); j++)
                         {
-                            for (int y = 0; y < yValues.Length; y++)
+                            for (int x = 0; x < xValues.Length; x++)
                             {
-                                if (x == y && xValues[x] == j && yValues[y] == i)
+                                for (int y = 0; y < yValues.Length; y++)
                                 {
-                                    if (array[i, j] == " % ")
+                                    if (x == y && xValues[x] - 1 == j && yValues[y] == array.GetLength(0) - i)
                                     {
-                                        xValues[x] = 20;
-                                        yValues[y] = 20;
-                                    }
-                                    if (array[i, j] == " / ")
-                                    {
-                                        array[i, j] = $" %{x + 1} ";
-                                        xValues[x] = 20;
-                                        yValues[y] = 20;
-                                    }
-                                    else
-                                    {
-                                        array[i, j] = $" {x + 1} ";
-                                        xValues[x] = 20;
-                                        yValues[y] = 20;
+                                        if (array[i, j].Contains('%'))
+                                        {
+                                            xValues[x] = xValues.Length + 1;
+                                            yValues[y] = yValues.Length + 1;
+                                        }
+                                        if (array[i, j].Contains('/'))
+                                        {
+                                            array[i, j] = $"  %{yValues[y]}  ";
+                                            xValues[x] = xValues.Length + 1;
+                                            yValues[y] = yValues.Length + 1;
+                                        }
+                                        else
+                                        {
+                                            array[i, j] = $"  {yValues[y]}  ";
+                                            if (yValues[y] > 9)
+                                            {
+                                                array[i, j] = $"  {yValues[y]} ";
+                                            }
+                                            xValues[x] = xValues.Length + 1;
+                                            yValues[y] = yValues.Length + 1;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                    // Display array
+
+                    var result = helper.StringRequest(customerRentals).Split('/');
+                    Console.WriteLine(result[1]);
+
+                    for (int i = 0; i < array.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < array.GetLength(1); j++)
+                        {
+                            if (int.TryParse(array[i, j], out int result1))
+                            {
+                                Console.ForegroundColor = ConsoleColor.Magenta;
+                                Console.Write(array[i, j]);
+                                Console.ForegroundColor = ConsoleColor.White;
+                            }
+                            if (array[i, j].Contains('/'))
+                            {
+                                Console.ForegroundColor = ConsoleColor.Blue;
+                                Console.Write(array[i, j]);
+                                Console.ForegroundColor = ConsoleColor.White;
+                            }
+                            if (array[i, j].Contains('%'))
+                            {
+                                Console.ForegroundColor = ConsoleColor.Blue;
+                                array[i, j] = array[i, j].Replace("%", "");
+                                Console.Write(array[i, j]);
+                                Console.ForegroundColor = ConsoleColor.White;
+                            }
+                            if (!int.TryParse(array[i, j], out int result2) && !array[i, j].Contains('/'))
+                            {
+                                Console.Write(array[i, j]);
+                            }
+                        }
+                        Console.WriteLine();
+                    }
+
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine(result[0]);
+
+                }
+                if (request == "per-film-length")
+                {
+                }
+                else
+                {
                 }
 
-                for (int i = 0; i < array.GetLength(0); i++)
-                {
-                    for (int j = 0; j < array.GetLength(1); j++)
-                    {
-                        if (int.TryParse(array[i, j], out int result1))
-                        {
-                            Console.ForegroundColor = ConsoleColor.Magenta;
-                            Console.Write(array[i, j]);
-                            Console.ForegroundColor = ConsoleColor.White;
-                        }
-                        if (array[i, j] == " / ")
-                        {
-                            Console.ForegroundColor = ConsoleColor.Blue;
-                            Console.Write(array[i, j]);
-                            Console.ForegroundColor = ConsoleColor.White;
-                        }
-                        if (array[i, j].Contains('%'))
-                        {
-                            Console.ForegroundColor = ConsoleColor.Blue;
-                            array[i, j] = array[i, j].Replace("%", "");
-                            Console.Write(array[i, j]);
-                            Console.ForegroundColor = ConsoleColor.White;
-                        }
-                        if (!int.TryParse(array[i, j], out int result2) && array[i, j] != " / ")
-                        {
-                            Console.Write(array[i, j]);
-                        }
-                    }
-                    Console.WriteLine();
-                }
-                Console.WriteLine($" X: Cost per rental\n Y: Rental per cost\n CustomerID: {customerId}");
 
                 Console.ReadKey();
             }
-        }
-
-        static double[] LeastSquares(double[] yValues, double[] xValues)
-        {
-            double xSigma = 0;
-
-            foreach (var x in xValues)
-            {
-                xSigma += x;
-            }
-
-            double ySigma = 0;
-
-            foreach (var y in yValues)
-            {
-                ySigma += y;
-            }
-
-            double xySigma = 0;
-
-            for (int i = 0; i < xValues.Length; i++)
-            {
-                xySigma += xValues[i] * yValues[i];
-            }
-
-            double xSigmaSqr = 0;
-
-            foreach (var x in xValues)
-            {
-                xSigmaSqr += x * x;
-            }
-
-            double n = xValues.Length;
-
-            double m = ((n * xySigma) - (xSigma * ySigma)) / ((n * xSigmaSqr) - (xSigma * xSigma));
-
-            double b = (ySigma - (m * xSigma)) / n;
-
-            var slope = new double[xValues.Length];
-
-            for (int i = 0; i < xValues.Length; i++)
-            {
-                slope[i] = (m * xValues[i]) + b;
-                slope[i] = Math.Round(slope[i]);
-
-                if (slope[i] > 19)
-                {
-                    slope[i] = 19;
-                }
-                if (slope[i] < 0)
-                {
-                    slope[i] = 0;
-                }
-            }
-
-            return slope;
         }
     }
 }

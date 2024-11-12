@@ -7,14 +7,15 @@ namespace SakilaLinearRegression
     {
         public double[] ValuesPerCostX(List<decimal> customerRentals)
         {
-            var groupedRentals = customerRentals.GroupBy(r => r)
+            var groupedRentals = customerRentals
+                .GroupBy(r => r)
                 .ToDictionary(g => g.Key, g => g.Count());
 
             var xValues = new double[groupedRentals.Count];
 
             for (int i = 0; i < xValues.Length; i++)
             {
-                xValues[i] = i;
+                xValues[i] = i + 1;
             }
 
             return xValues;
@@ -22,42 +23,109 @@ namespace SakilaLinearRegression
 
         public double[] ValuesPerCostY(List<decimal> customerRentals)
         {
-            var groupedRentals = customerRentals.GroupBy(r => r)
-                .OrderBy(r => r)
+            var dictionaryRentals = customerRentals
+                .GroupBy(r => r)
+                .OrderBy(g => g.Key)
                 .ToDictionary(g => g.Key, g => g.Count());
 
-            var yValues = new double[groupedRentals.Count];
+            var yValues = new double[dictionaryRentals.Count];
+            var listRentals = dictionaryRentals.ToList();
 
             for (int i = 0; i < yValues.Length; i++)
             {
-                for (int j = 0; j < groupedRentals.Count; j++)
-                {
-                    yValues[i] += groupedRentals[j];
-                }
+                yValues[i] += listRentals[i].Value;
             }
 
             return yValues;
         }
 
-        public double[] ValuesRequestX(List<decimal> customerRentals, string request)
+        public string[,] CreateArray(int yValuesLength, int xValuesLength)
         {
-            switch (request)
+            var array = new string[yValuesLength, xValuesLength];
+
+            for (int i = 0; i < array.GetLength(0); i++)
             {
-                case "per cost":
-                    return ValuesPerCostX(customerRentals);
-                default:
-                    throw new Exception();
+                for (int j = 0; j < array.GetLength(1); j++)
+                {
+                    array[i, j] = "  -  ";
+                }
             }
+
+            return array;
         }
 
-        public double[] ValuesRequestY(List<decimal> customerRentals, string request)
+        public double[] LeastSquares(double[] yValues, double[] xValues)
         {
-            switch (request)
+            double xSigma = 0;
+
+            foreach (var x in xValues)
             {
-                case "per cost":
-                    return ValuesPerCostY(customerRentals);
-                default:
-                    throw new Exception();
+                xSigma += x;
+            }
+
+            double ySigma = 0;
+
+            foreach (var y in yValues)
+            {
+                ySigma += y;
+            }
+
+            double xySigma = 0;
+
+            for (int i = 0; i < xValues.Length; i++)
+            {
+                xySigma += xValues[i] * yValues[i];
+            }
+
+            double xSigmaSqr = 0;
+
+            foreach (var x in xValues)
+            {
+                xSigmaSqr += x * x;
+            }
+
+            double n = xValues.Length;
+
+            double m = ((n * xySigma) - (xSigma * ySigma)) / ((n * xSigmaSqr) - (xSigma * xSigma));
+
+            double b = (ySigma - (m * xSigma)) / n;
+
+            var slope = new double[xValues.Length];
+
+            for (int i = 0; i < xValues.Length; i++)
+            {
+                slope[i] = (m * xValues[i]) + b;
+                slope[i] = Math.Round(slope[i]);
+
+                if (slope[i] > slope.Length)
+                {
+                    slope[i] = slope.Length;
+                }
+                if (slope[i] < 0)
+                {
+                    slope[i] = 0;
+                }
+            }
+
+            return slope;
+        }
+
+        public string StringRequest<T>(List<T> customerRentals)
+        {
+            var dictionaryRentals = customerRentals
+                .GroupBy(r => r)
+                .OrderBy(g => g.Key)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            var listRentals = dictionaryRentals.ToList();
+
+            if (listRentals.Any(r => r.Key.GetType() == typeof(decimal)))
+            {
+                return string.Join(' ', listRentals.Select(r => $"  {Convert.ToInt32(r.Key)}$".Replace(",99", ""))) + "/  X: Cost per rental\n  Y: Rentals per cost";
+            }
+            else
+            {
+                throw new Exception();
             }
         }
     }
