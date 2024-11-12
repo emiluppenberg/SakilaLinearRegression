@@ -24,14 +24,19 @@ namespace SakilaLinearRegression
                     var customerRentals = context.DataPerCost(customerId);
                     xValues = helper.ValuesPerCostX(customerRentals);
                     yValues = helper.ValuesPerCostY(customerRentals);
+                    var dictionaryRentals = customerRentals
+                        .GroupBy(r => r)
+                        .OrderBy(g => g.Key)
+                        .ToDictionary(g => g.Key, g => g.Count());
 
-                    string[,] array = helper.CreateArray(yValues.Length, xValues.Length);
+                    int ySize = dictionaryRentals.Max(r => r.Value);
+                    string[,] array = helper.CreateArray(ySize, xValues.Length);
 
                     var slope = helper.LeastSquares(yValues, xValues);
 
                     for (int i = 0; i < slope.Length; i++)
                     {
-                        array[array.GetLength(0) - Convert.ToInt32(slope[i]), Convert.ToInt32(xValues[i]) - 1] = "  /  ";
+                        array[(array.GetLength(0) - 1) - Convert.ToInt32(slope[i]), Convert.ToInt32(xValues[i]) - 1] = "  /  ";
                     }
 
                     // Write data to array
@@ -71,11 +76,9 @@ namespace SakilaLinearRegression
                             }
                         }
                     }
+
                     // Display array
-
-                    var result = helper.StringRequest(customerRentals).Split('/');
-                    Console.WriteLine(result[1]);
-
+                    Console.WriteLine("\n  X: Cost per rental\n  Y: Rentals per cost");
                     for (int i = 0; i < array.GetLength(0); i++)
                     {
                         for (int j = 0; j < array.GetLength(1); j++)
@@ -108,7 +111,7 @@ namespace SakilaLinearRegression
                     }
 
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine(result[0]);
+                    Console.WriteLine(helper.StringRequest(customerRentals));
 
                 }
                 if (request == "per-film-length")

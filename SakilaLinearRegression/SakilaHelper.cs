@@ -28,8 +28,8 @@ namespace SakilaLinearRegression
                 .OrderBy(g => g.Key)
                 .ToDictionary(g => g.Key, g => g.Count());
 
-            var yValues = new double[dictionaryRentals.Count];
             var listRentals = dictionaryRentals.ToList();
+            var yValues = new double[listRentals.Count];
 
             for (int i = 0; i < yValues.Length; i++)
             {
@@ -121,7 +121,10 @@ namespace SakilaLinearRegression
 
             if (listRentals.Any(r => r.Key.GetType() == typeof(decimal)))
             {
-                return string.Join(' ', listRentals.Select(r => $"  {Convert.ToInt32(r.Key)}$".Replace(",99", ""))) + "/  X: Cost per rental\n  Y: Rentals per cost";
+                return string.Join(' ', listRentals.Select(
+                    r => Convert.ToInt32(r.Key) > 9
+                    ? $" {Convert.ToInt32(r.Key)}$".Replace(",99", "")
+                    : $"  {Convert.ToInt32(r.Key)}$".Replace(",99", "")));
             }
             else
             {
