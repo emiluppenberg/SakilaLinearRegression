@@ -22,5 +22,17 @@ namespace SakilaLinearRegression
                 .SqlQueryRaw<decimal>("select amount from payment where customer_id = @p0", customerId)
                 .ToList();
         }
+
+        internal List<string> DataPerFilmRating(int customerId)
+        {
+            return Database
+                .SqlQueryRaw<string>(
+                "select f.rating " +
+                "from film f " +
+                "inner join inventory i on i.film_id = f.film_id " +
+                "inner join rental r on r.inventory_id = i.inventory_id " +
+                "where r.customer_id = @p0", customerId)
+                .ToList();
+        }
     }
 }

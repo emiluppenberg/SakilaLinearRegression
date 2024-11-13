@@ -5,7 +5,7 @@ namespace SakilaLinearRegression
 {
     internal class SakilaHelper
     {
-        public double[] ValuesPerCostX(List<decimal> customerRentals)
+        public double[] ValuesPerDataX<T>(List<T> customerRentals)
         {
             var groupedRentals = customerRentals
                 .GroupBy(r => r)
@@ -21,7 +21,7 @@ namespace SakilaLinearRegression
             return xValues;
         }
 
-        public double[] ValuesPerCostY(List<decimal> customerRentals)
+        public double[] ValuesPerDataY<T>(List<T> customerRentals)
         {
             var dictionaryRentals = customerRentals
                 .GroupBy(r => r)
@@ -126,10 +126,18 @@ namespace SakilaLinearRegression
                     ? $" {Convert.ToInt32(r.Key)}$".Replace(",99", "")
                     : $"  {Convert.ToInt32(r.Key)}$".Replace(",99", "")));
             }
+            if (listRentals.Any(r => r.Key.GetType() == typeof(string)))
+            {
+                return string.Join(' ', listRentals.Select(
+                    r => r.Key.ToString().Count() > 1
+                    ? $" {r.Key.ToString().Replace("-", "")}"
+                    : $"  {r.Key.ToString().Replace("-", "")}"));
+            }
             else
             {
                 throw new Exception();
             }
         }
+
     }
 }

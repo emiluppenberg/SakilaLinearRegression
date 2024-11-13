@@ -11,15 +11,15 @@ namespace SakilaLinearRegression
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write("  Press 1 - ");
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.Write("Total rentals per cost\n");
+                Console.Write("Total rentals per film price\n");
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write("  Press 2 - ");
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.Write("Total rentals per film length\n");
+                Console.Write("Total rentals per film rating\n");
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("  Press 3 - ");
+                Console.Write("  Press 0 - ");
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.Write("Total rentals per rating\n");
+                Console.Write("Exit program\n");
                 Console.ForegroundColor = ConsoleColor.White;
 
                 switch (Console.ReadKey(true).KeyChar)
@@ -27,9 +27,10 @@ namespace SakilaLinearRegression
                     case '1':
                         return "per-cost";
                     case '2':
-                        return "per-film-length";
-                    case '3':
                         return "per-film-rating";
+                    case '0':
+                        Environment.Exit(0);
+                        break;
                     default:
                         Console.Clear();
                         Console.WriteLine("  Invalid input");
