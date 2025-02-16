@@ -13,7 +13,7 @@ namespace SakilaLinearRegression
     {
         //private readonly string connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Sakila;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
 
-        private readonly string path = Directory.GetCurrentDirectory() + "\\";
+        private readonly string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data\\");
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
@@ -60,13 +60,11 @@ namespace SakilaLinearRegression
             var rentals = json
                 .Select(x => JsonSerializer.Deserialize<RentalJson>(x)).ToList();
 
-            var data = (from f in films
+            return (from f in films
                        join i in inventorys on f.film_id equals i.film_id
                        join r in rentals on i.inventory_id equals r.inventory_id
                        where r.customer_id == customerId
                        select f.rating).ToList();
-
-            return data;
         }
     }
 }
