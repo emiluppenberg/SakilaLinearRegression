@@ -46,12 +46,15 @@ namespace SakilaLinearRegression
             {
                 Console.Clear();
 
-                Console.Write("  CustomerId: ");
+                Console.Write("  (Enter a number between 1-599) CustomerID: ");
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                 if (int.TryParse(Console.ReadLine(), out int customerId))
                 {
-                    Console.ForegroundColor = ConsoleColor.White;
-                    return customerId;
+                    if (customerId > 0 && customerId < 600)
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+                        return customerId;
+                    }
                 }
 
                 Console.ForegroundColor = ConsoleColor.White;
